@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+
+	<meta name="viewport" content="width=device-width,
+	initial-scale=1">
+
+	<link rel="stylesheet" href="{{ url_for('static',
+	filename='css/bootstrap.min.css') }}">
+
+	<link rel="shortcut icon" href="{{ url_for('static',
+	filename='favicon.ico') }}">
+
+	<link rel="stylesheet" href="{{ url_for('static',
+	filename='css/image.css') }}">
+
+	<header>
+		<nav class="navbar navbar-default" style="background-color: #2E8B57;" >
+
+    		<div class="navbar-header">
+
+            <a class="navbar-brand" href="{{ url_for('user_main') }}">
+            	<img style="max-width:35px; margin-top:-8px; color: #F1EA47;" alt="Restaurants" src="{{ url_for('static',
+                    filename='images/rests.png') }}">
+            </a>
+
+    	    </div>
+
+					<ul class="nav navbar-nav navbar-right">
+
+					  <div style="margin-right: 10px; margin-left: 15px; margin-top: 5px; margin-bottom: 5px;"  class="container-fluid">
+							<h5>
+							<!-- Display user settings and logout button if logged in, else display sign in and register -->
+							{% if g.user.is_authenticated %}
+
+								  {{ current_user.username }}
+								<a style="color:#F1EA47;" role="presentation" class="active" href="/logout/"><span class="glyphicon glyphicon-off"></span> Log out</a>
+
+								{% else %}
+								<a style="margin-right:5px; color:#F1EA47;" role="presentation" href="/login/"><span class="glyphicon glyphicon-log-in"></span>
+								 Login   </a>
+
+								<a style="color:#F1EA47;" role="presentation" class="active" href="/register/"><span class="glyphicon glyphicon-pencil"></span> Sign up</a>
+							</h5>
+							{% endif %}
+
+				  		</div>
+	      	</ul>
+
+    <div class="container-fluid">
+    		<!-- Single button dropdown menu -->
+			<div class="btn-group navbar-right">
+  			<button style="margin-top:8px; margin-right:5px;" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    			Menu <span class="caret"></span>
+  			</button>
+  			<ul class="dropdown-menu">			<!-- Dropdown links are unused at the moment -->
+    			<li><a href="#">About</a></li>
+    			<li><a href="#">Projects</a></li>
+    			<li role="separator" class="divider"></li>
+    			<li><a href="#">Contact</a></li>
+  			</ul>
+			</div>
+
+			<!-- Search bar -->
+			<form class="navbar-form navbar-left" role="search" action="/search/" method="POST">
+  				<div class="form-group">
+    			<input type="text" class="form-control" placeholder="Search" name="search">
+  				</div>
+  				<button type="submit" class="btn btn-default">
+  				<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+  				</button>
+			</form>
+
+			</div>
+		</nav>
+
+	</header>
+
+	<script src="https://code.jquery.com/jquery-3.1.0.min.js"
+	integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous">
+	</script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+</head>
+
+
+<body>
+
+	<div class="container-fluid" style="max-width: 80%;">
+		{% with messages = get_flashed_messages() %}
+		  {% if messages %}
+			{% for message in messages %}
+			<div class="alert alert-warning alert-dismissible" role="alert">
+		  		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+				{{message}}
+			 </div>
+			{% endfor %}
+		{% endif %}
+		{% endwith %}
+
+		{% if error %}
+			<div class="alert alert-danger alert-dismissible" role="alert">
+			  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+				{{error}}
+			 </div>
+		{% endif %}
+	</div>
+
+	<div class="border-row" style="width:100%; margin-bottom: 15px;"></div>
+	<div class="container-fluid" style="margin-bottom:5px; width:80%; min-height: 100vh;">
+
+	{% block body %}
+
+
+	{% endblock %}
+
+	</div>
+
+</body>
+<div class="container-fluid " style="position:fixed; bottom:0; left:0; right:0; width:100%;">
+<footer class="panel-footer">
+
+    <div class="footer-copyright" align='center'>
+      <div class="container">
+      © 2016 Movie Recomendations.
+
+      </div>
+
+    </div>
+</footer>
+</div>
+</html>
