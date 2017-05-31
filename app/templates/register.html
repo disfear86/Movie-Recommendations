@@ -1,0 +1,31 @@
+{% extends 'header.html' %}
+
+<body>
+{% block body %}
+<div id="fb-root"></div>
+
+<head>
+	<title>Sign up</title>
+</head>
+
+<div align="middle" class = "container">
+	<h4>Sign up</h4>
+	<br>
+	{% from "_formhelpers.html" import render_field %}
+	<form name="loginform" method="POST">
+		<dl>
+      {{render_field(form.username)}}
+			{{render_field(form.email)}}
+			{{render_field(form.password)}}
+			{{render_field(form.confirm)}}
+		</dl>
+
+		<p><input class="btn btn-primary" type=submit value="Register"></p>
+				<input type=hidden value="{{ next or '' }}" name=next>
+        or
+	</form>
+
+</div>
+
+{% endblock %}
+</body>
