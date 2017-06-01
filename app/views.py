@@ -8,10 +8,13 @@ from sqlalchemy.orm import sessionmaker
 from app.forms import LoginForm, RegistrationForm
 from app.auth import log_in
 from passlib.hash import sha256_crypt
+from recommend import find_similar
 import pandas as pd
 import numpy as np
-import os
-from pathlib2 import Path
+from celery import Celery
+import gc
+from imdb import IMDb
+
 
 Base.metadata.bind = engine
 
@@ -19,6 +22,22 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 movie_ratings = pd.read_csv('app/movie_ratings.csv')
+
+ratings_table = movie_ratings.pivot_table(index=['user_id'],
+                                          columns=['movie_id'],
+                                          values='rating')
+
+'''
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
+
+
+@celery.task(bind=True)
+def get_info_task(self, title, ia):
+    s_result = ia.search_movie(title)[0].movieID
+    result = ia.get_movie(s_result)
+    return result
+'''
 
 
 @app.before_request
@@ -88,7 +107,8 @@ def user_main():
     user = current_user
     _user = movie_ratings['user_id'] == user.id
     user_movies = movie_ratings[_user]
-    z = zip(user_movies['movie_id'], user_movies['title'])
+    user_movies.sort_values(['title'], inplace=True)
+    z = zip(user_movies['movie_id'], user_movies['title'], user_movies['rating'])
     return render_template('user.html', data=user_movies, z=z)
 
 
@@ -98,7 +118,20 @@ def movie_page(movie_id):
     user = current_user
     _movie = movie_ratings[movie_ratings['movie_id'] == movie_id]
     movie = _movie[_movie['user_id'] == user.id]
-    return render_template('movie.html', data=movie, user=user)
+    title = str(movie['title'].values[0][:-6])
+
+    # ia = IMDb()
+    # res = get_info_task(title, ia)
+
+    similar = find_similar(ratings_table, movie_id)
+    similar_ids = pd.Series(similar.index.values.tolist())
+
+    movie_group = movie_ratings.drop_duplicates(subset=['movie_id'], keep='first', inplace=False)
+    movie_list = [movie_group.iloc[i] for i in similar_ids]
+
+    gc.collect()
+    return render_template('movie.html', data=movie, title=title,
+                           movie_list=movie_list)
 
 
 @app.errorhandler(404)
