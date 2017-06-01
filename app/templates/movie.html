@@ -4,7 +4,7 @@
 {% block body %}
 
 <head>
-	<title>List of restaurants</title>
+	<title>{{data['title'].values[0]}}</title>
 </head>
 
 <div align="middle" class = "container">
@@ -12,6 +12,12 @@
 	<p>
     Recomended for you
 
+	<p>
+
+	{% for movie in movie_list %}
+		{{ movie['title'] }}, {{ movie['rating'] }}
+		<br>
+	{% endfor %}
 
 </div>
 
