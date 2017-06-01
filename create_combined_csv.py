@@ -14,4 +14,4 @@ movie_ratings = movie_ratings.pivot_table(index=['user_id'],
 
 # restack and write to file
 r = movie_ratings.stack()
-r.to_csv('app/data/ratings.csv')
+r.to_csv('data/ratings.csv')
