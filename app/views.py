@@ -2,21 +2,23 @@ from app import app
 from app.models import Base, User
 from create_db import engine
 
-from flask import render_template, redirect, url_for, request, flash, jsonify, g
-from flask import session as ls
+from flask import render_template, redirect, url_for, request, flash, g
 from flask_login import login_user, current_user, logout_user, login_required
 from sqlalchemy.orm import sessionmaker
-from app import forms
 from app.forms import LoginForm, RegistrationForm
-from app.oauth import FacebookOAuth, GoogleOAuth
 from app.auth import log_in
 from passlib.hash import sha256_crypt
-
+import pandas as pd
+import numpy as np
+import os
+from pathlib2 import Path
 
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+movie_ratings = pd.read_csv('app/movie_ratings.csv')
 
 
 @app.before_request
@@ -84,43 +86,19 @@ def logout():
 @login_required
 def user_main():
     user = current_user
-    return render_template('user.html', user=user)
+    _user = movie_ratings['user_id'] == user.id
+    user_movies = movie_ratings[_user]
+    z = zip(user_movies['movie_id'], user_movies['title'])
+    return render_template('user.html', data=user_movies, z=z)
 
 
-@app.route('/search/', methods=['GET', 'POST'])
-def search():
-    if request.method == "POST":
-
-        search_data = request.form['search']
-        if not search_data:
-            data = 'No data entered.'
-            return redirect(url_for('search', data=data))
-
-        restaurants = []
-        menus = []
-
-        search_rests = session.query(Restaurant).all()
-        for entry in search_rests:
-            if entry.name.lower().startswith(search_data):
-                restaurants.append(entry)
-
-        search_menu = session.query(MenuItem).all()
-        for entry in search_menu:
-            if entry.name.startswith(search_data):
-                rest_name = session.query(Restaurant).filter_by(id=entry.restaurant_id).one()
-                menus.append((entry, rest_name))
-
-        if restaurants == []:
-            rests_data = 'No restaurants found.'
-        else:
-            rests_data = restaurants
-        if menus == []:
-            menu_data = 'No menu entries found.'
-        else:
-            menu_data = menus
-
-        return render_template('search.html', rests_data=rests_data,
-                                menu_data=menu_data)
+@app.route('/user/<int:movie_id>')
+@login_required
+def movie_page(movie_id):
+    user = current_user
+    _movie = movie_ratings[movie_ratings['movie_id'] == movie_id]
+    movie = _movie[_movie['user_id'] == user.id]
+    return render_template('movie.html', data=movie, user=user)
 
 
 @app.errorhandler(404)
