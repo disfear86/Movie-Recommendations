@@ -4,17 +4,25 @@
 {% block body %}
 
 <head>
-	<title>List of restaurants</title>
+	<title>List of movies</title>
 </head>
 
 <div align="middle" class = "container">
 	<h4>Your Movies</h4>
 	<br>
-	{% for id, movie in z %}
-  <a href="{{id}}">{{movie}}</a>
-  <br>
-  {% endfor %}
+	<table>
+		<tr>
+			<th>Movie</th>
+			<th>Your Rating</th>
+		</tr>
 
+		{% for id, movie, rating in z %}
+		<tr>
+	  		<td><a href="{{id}}">{{movie}}</a></td>
+	  		<td align=center>{{ rating }}</a></td>
+		</tr>
+	  {% endfor %}
+</table>
 </div>
 
 {% endblock %}
