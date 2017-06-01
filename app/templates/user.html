@@ -1,0 +1,25 @@
+{% extends 'header.html' %}
+<body>
+
+{% block body %}
+
+<head>
+	<title>List of restaurants</title>
+</head>
+
+<div align="middle" class = "container">
+	<h4>Your Movies</h4>
+	<br>
+	{% for id, movie in z %}
+  <a href="{{id}}">{{movie}}</a>
+  <br>
+  {% endfor %}
+
+</div>
+
+{% endblock %}
+
+</body>
+
+
+</html>
