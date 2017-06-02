@@ -23,6 +23,7 @@ session = DBSession()
 
 movie_ratings = pd.read_csv('app/movie_ratings.csv')
 
+# create pivot table
 ratings_table = movie_ratings.pivot_table(index=['user_id'],
                                           columns=['movie_id'],
                                           values='rating')
@@ -105,7 +106,9 @@ def logout():
 @login_required
 def user_main():
     user = current_user
+    # get movies the user has rated
     _user = movie_ratings['user_id'] == user.id
+    # create dataframe from those movies
     user_movies = movie_ratings[_user]
     user_movies.sort_values(['title'], inplace=True)
     z = zip(user_movies['movie_id'], user_movies['title'], user_movies['rating'])
@@ -116,22 +119,29 @@ def user_main():
 @login_required
 def movie_page(movie_id):
     user = current_user
+    # get specific movie by movie_id
     _movie = movie_ratings[movie_ratings['movie_id'] == movie_id]
+    # get user's rated version of the movie
     movie = _movie[_movie['user_id'] == user.id]
+    # get movie title
     title = str(movie['title'].values[0][:-6])
 
     # ia = IMDb()
     # res = get_info_task(title, ia)
 
     similar = find_similar(ratings_table, movie_id)
+    # create list of values
     similar_ids = pd.Series(similar.index.values.tolist())
-
+    # drop duplicate entries from movie_ratings table
     movie_group = movie_ratings.drop_duplicates(subset=['movie_id'], keep='first', inplace=False)
+    # create list of the matched movies from the dataset and the list
     movie_list = [movie_group.iloc[i] for i in similar_ids]
+    # keep only movies with rating >= 4
+    over_four_rating = [movie_list[i] for i in range(len(movie_list)) if movie_list[i][4] >= 4]
 
     gc.collect()
     return render_template('movie.html', data=movie, title=title,
-                           movie_list=movie_list)
+                           movie_list=over_four_rating[:5])
 
 
 @app.errorhandler(404)
