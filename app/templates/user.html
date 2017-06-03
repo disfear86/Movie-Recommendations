@@ -5,12 +5,22 @@
 
 <head>
 	<title>List of movies</title>
+
+	<script>
+		function getTitle(){
+					$('body').scrollTop(0);
+					document.getElementById('comp').innerHTML = 'Computing Recommendation...';
+		};
+	</script>
+
 </head>
 
+
 <div align="middle" class = "container">
+	<font color="red"><p id="comp" style="font-color: red;"></p></font>
 	<h4>Your Movies</h4>
 	<br>
-	<table>
+	<table id="move_table">
 		<tr>
 			<th>Movie</th>
 			<th>Your Rating</th>
@@ -18,7 +28,7 @@
 
 		{% for id, movie, rating in z %}
 		<tr>
-	  		<td><a href="{{id}}">{{movie}}</a></td>
+	  		<td id={{movie}}><a id="m_title" href="{{id}}" onclick="getTitle()">{{movie}}</a></td>
 	  		<td align=center>{{ rating }}</a></td>
 		</tr>
 	  {% endfor %}
