@@ -12,14 +12,17 @@ from recommend import find_similar
 import pandas as pd
 import numpy as np
 from celery import Celery
+from tmdb_posters import get_poster
 import gc
-from imdb import IMDb
+from imdbpie import Imdb
 
 
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+imdb = Imdb(anonymize=True)
 
 movie_ratings = pd.read_csv('app/movie_ratings.csv')
 
@@ -28,6 +31,7 @@ ratings_table = movie_ratings.pivot_table(index=['user_id'],
                                           columns=['movie_id'],
                                           values='rating')
 
+tmdb_url = "http://api.themoviedb.org/3/configuration?api_key=" + app.config['MOVIE_DB_API_KEY']
 '''
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
@@ -126,7 +130,9 @@ def movie_page(movie_id):
     # get movie title
     title = str(movie['title'].values[0][:-6])
 
-    # ia = IMDb()
+    info_imdb = imdb.search_for_title(title)
+    imdb_id = info_imdb[0]['imdb_id']
+    image = get_poster(imdb_id)
     # res = get_info_task(title, ia)
 
     similar = find_similar(ratings_table, movie_id)
@@ -141,7 +147,7 @@ def movie_page(movie_id):
 
     gc.collect()
     return render_template('movie.html', data=movie, title=title,
-                           movie_list=over_four_rating[:5])
+                           movie_list=over_four_rating[:5], image=image)
 
 
 @app.errorhandler(404)
