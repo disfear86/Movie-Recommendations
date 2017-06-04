@@ -11,7 +11,7 @@ from passlib.hash import sha256_crypt
 from recommend import find_similar
 import pandas as pd
 import numpy as np
-from celery import Celery
+# from celery import Celery
 from tmdb_posters import get_poster
 import gc
 from imdbpie import Imdb
@@ -32,6 +32,7 @@ ratings_table = movie_ratings.pivot_table(index=['user_id'],
                                           values='rating')
 
 tmdb_url = "http://api.themoviedb.org/3/configuration?api_key=" + app.config['MOVIE_DB_API_KEY']
+
 '''
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
