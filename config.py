@@ -8,3 +8,4 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 SECRET_KEY = 'dev-key'
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+MOVIE_DB_API_KEY = '<tmdb api key>'
